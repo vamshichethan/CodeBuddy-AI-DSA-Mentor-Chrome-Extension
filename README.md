@@ -43,6 +43,42 @@ The extension can still be pointed at a local backend from the popup settings.
 
 ---
 
+## 🔗 Public URLs
+
+- GitHub Repository: https://github.com/vamshichethan/CodeBuddy-AI-DSA-Mentor-Chrome-Extension
+- Live Dashboard: https://codebuddy-ai-dsa-mentor.vercel.app
+- API Health Check: https://codebuddy-ai-dsa-mentor.vercel.app/health
+- Production API Base URL: `https://codebuddy-ai-dsa-mentor.vercel.app/api`
+- Extension ZIP for private testing: `/private/tmp/codebuddy-extension.zip`
+
+---
+
+## 📦 Sharing the Extension
+
+### Option 1: Share privately
+
+You can send people the extension ZIP:
+
+```
+/private/tmp/codebuddy-extension.zip
+```
+
+They must install it manually using **Developer mode**:
+
+```
+1. Download and unzip codebuddy-extension.zip
+2. Open Chrome → chrome://extensions/
+3. Enable Developer mode
+4. Click Load unpacked
+5. Select the unzipped extension folder
+6. Pin CodeBuddy AI
+7. Open a LeetCode problem and click the extension icon
+```
+
+This is okay for friends/testers, not ideal for public users. For everyone to install it normally, publish it on the Chrome Web Store.
+
+---
+
 ## 🎯 Core Idea
 
 > **Most AI tools give you the answer. CodeBuddy AI teaches you how to find it.**
