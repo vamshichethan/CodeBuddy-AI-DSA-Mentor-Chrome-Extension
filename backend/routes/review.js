@@ -6,6 +6,31 @@ const { reviewPrompt } = require('../prompts/templates');
 const router = express.Router();
 const genAI  = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+function buildFallbackReview({ title, language }) {
+  return `
+**Code Review for ${title}**
+
+**Correctness Checklist**
+- Confirm the code handles minimum-size inputs.
+- Check duplicate values, negative values, and repeated states where relevant.
+- Add at least one test that targets the main edge case.
+
+**Complexity Checklist**
+- Look for nested loops over the same input.
+- If constraints are large, prefer hash maps, two pointers, stacks, queues, heaps, or DP state instead of repeated scanning.
+
+**Clean Code Checklist**
+- Use descriptive variable names.
+- Keep the core loop easy to trace.
+- Avoid mutating input unless the approach requires it.
+
+**${language || 'Language'} Tip**
+Use the standard library data structure that best matches the operation you need most: lookup, ordering, queueing, or stack behavior.
+
+AI code review is temporarily unavailable, so this fallback review keeps the workflow unblocked.
+`.trim();
+}
+
 router.post('/', async (req, res) => {
   const { title, userCode, language } = req.body;
 
@@ -21,7 +46,11 @@ router.post('/', async (req, res) => {
     res.json({ review: text });
   } catch (err) {
     console.error('[/api/review]', err.message);
-    res.status(500).json({ error: 'Failed to generate review', details: err.message });
+    res.json({
+      review: buildFallbackReview({ title, language }),
+      fallback: true,
+      warning: 'AI code review is temporarily unavailable. Showing fallback review instead.',
+    });
   }
 });
 

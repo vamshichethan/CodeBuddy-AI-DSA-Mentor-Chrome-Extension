@@ -7,7 +7,7 @@ const DEFAULT_API_BASE = 'https://codebuddy-ai-dsa-mentor.vercel.app/api';
 const DEFAULT_DASHBOARD_URL = 'https://codebuddy-ai-dsa-mentor.vercel.app';
 const LOCAL_API_BASE = 'http://localhost:3001/api';
 const LOCAL_DASHBOARD_URL = 'http://localhost:5173';
-const CONNECTION_KEYS = ['apiBaseUrl', 'dashboardUrl'];
+const CONNECTION_KEYS = ['apiBaseUrl', 'dashboardUrl', 'useLocalDev'];
 
 // ── State ──────────────────────────────────────────
 const state = {
@@ -65,13 +65,28 @@ function normalizeDashboardUrl(value) {
   return (value || DEFAULT_DASHBOARD_URL).trim().replace(/\/+$/, '');
 }
 
+function isLocalUrl(value) {
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(value || '');
+}
+
 async function loadSettings() {
   return new Promise((resolve) => {
     chrome.storage.local.get(CONNECTION_KEYS, (res) => {
-      state.apiBaseUrl = normalizeApiBase(res.apiBaseUrl);
-      state.dashboardUrl = normalizeDashboardUrl(res.dashboardUrl);
+      const storedApiBaseUrl = normalizeApiBase(res.apiBaseUrl);
+      const storedDashboardUrl = normalizeDashboardUrl(res.dashboardUrl);
+      const shouldUseProduction = !res.useLocalDev && (isLocalUrl(storedApiBaseUrl) || isLocalUrl(storedDashboardUrl));
+
+      state.apiBaseUrl = shouldUseProduction ? DEFAULT_API_BASE : storedApiBaseUrl;
+      state.dashboardUrl = shouldUseProduction ? DEFAULT_DASHBOARD_URL : storedDashboardUrl;
       $('apiBaseInput').value = state.apiBaseUrl;
       $('dashboardUrlInput').value = state.dashboardUrl;
+      if (shouldUseProduction) {
+        chrome.storage.local.set({
+          apiBaseUrl: state.apiBaseUrl,
+          dashboardUrl: state.dashboardUrl,
+          useLocalDev: false,
+        });
+      }
       resolve();
     });
   });
@@ -180,6 +195,7 @@ $('saveSettingsBtn').addEventListener('click', () => {
   chrome.storage.local.set({
     apiBaseUrl: state.apiBaseUrl,
     dashboardUrl: state.dashboardUrl,
+    useLocalDev: isLocalUrl(state.apiBaseUrl) || isLocalUrl(state.dashboardUrl),
   }, () => showToast('Settings saved.'));
 });
 
@@ -192,6 +208,7 @@ $('resetSettingsBtn').addEventListener('click', () => {
     chrome.storage.local.set({
       apiBaseUrl: state.apiBaseUrl,
       dashboardUrl: state.dashboardUrl,
+      useLocalDev: true,
     }, () => showToast('Switched to local development URLs.'));
   });
 });
