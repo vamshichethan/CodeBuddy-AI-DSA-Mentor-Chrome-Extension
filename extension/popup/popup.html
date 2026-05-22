@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeBuddy AI</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ── Header ── -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🧠</span>
+        <div class="logo-text">
+          <span class="logo-name">CodeBuddy AI</span>
+          <span class="logo-sub">DSA Mentor</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="badge" id="difficultyBadge">—</span>
+        <button class="icon-btn" id="settingsBtn" title="Settings">⚙️</button>
+      </div>
+    </header>
+
+    <!-- ── Problem Card ── -->
+    <div class="problem-card" id="problemCard">
+      <div class="problem-loading" id="problemLoading">
+        <div class="spinner"></div>
+        <p>Reading problem…</p>
+      </div>
+      <div class="problem-info hidden" id="problemInfo">
+        <div class="problem-title" id="problemTitle">—</div>
+        <div class="problem-meta">
+          <span class="lang-tag" id="langTag">—</span>
+          <span class="hint-counter">Hints used: <b id="hintCount">0</b>/5</span>
+        </div>
+      </div>
+      <div class="not-leetcode hidden" id="notLeetCode">
+        <div class="not-lc-icon">🔍</div>
+        <p>Open a <strong>LeetCode problem</strong> to start.</p>
+        <a href="https://leetcode.com/problemset/" target="_blank" class="go-btn">Go to LeetCode →</a>
+      </div>
+    </div>
+
+    <!-- ── Tab Bar ── -->
+    <div class="tabs" id="tabBar">
+      <button class="tab active" data-tab="hints">💡 Hints</button>
+      <button class="tab" data-tab="debug">🐞 Debug</button>
+      <button class="tab" data-tab="pattern">🧩 Pattern</button>
+      <button class="tab" data-tab="complexity">⏱️ Complex</button>
+      <button class="tab" data-tab="interview">🎙️ Interview</button>
+    </div>
+
+    <!-- ── Panel: Hints ── -->
+    <div class="panel active" id="panel-hints">
+      <div class="hint-levels">
+        <p class="panel-desc">Get progressive hints — not direct answers.</p>
+        <div class="level-buttons">
+          <button class="level-btn" data-level="1">
+            <span class="lv">L1</span><span class="lv-label">Pattern</span>
+          </button>
+          <button class="level-btn" data-level="2">
+            <span class="lv">L2</span><span class="lv-label">Observe</span>
+          </button>
+          <button class="level-btn" data-level="3">
+            <span class="lv">L3</span><span class="lv-label">Approach</span>
+          </button>
+          <button class="level-btn" data-level="4">
+            <span class="lv">L4</span><span class="lv-label">Pseudo</span>
+          </button>
+          <button class="level-btn locked" data-level="5">
+            <span class="lv">🔒</span><span class="lv-label">Code</span>
+          </button>
+        </div>
+      </div>
+      <div class="response-box hidden" id="hintResponse">
+        <div class="response-header">
+          <span class="response-label" id="hintLabel">Level 1 Hint</span>
+          <button class="copy-btn" id="copyHint">Copy</button>
+        </div>
+        <div class="response-content" id="hintContent"></div>
+      </div>
+      <button class="primary-btn" id="getHintBtn">
+        <span class="btn-icon">✨</span> Get Next Hint
+      </button>
+    </div>
+
+    <!-- ── Panel: Debug ── -->
+    <div class="panel hidden" id="panel-debug">
+      <p class="panel-desc">Analyze your current code for bugs & issues.</p>
+      <div class="response-box hidden" id="debugResponse">
+        <div class="response-header">
+          <span class="response-label">Debug Report</span>
+          <button class="copy-btn" id="copyDebug">Copy</button>
+        </div>
+        <div class="response-content" id="debugContent"></div>
+      </div>
+      <button class="primary-btn" id="debugBtn">
+        <span class="btn-icon">🔍</span> Analyze My Code
+      </button>
+      <button class="secondary-btn" id="edgeCaseBtn">
+        <span class="btn-icon">🧪</span> Generate Edge Cases
+      </button>
+      <div class="response-box hidden" id="edgeCaseResponse">
+        <div class="response-header">
+          <span class="response-label">Edge Cases</span>
+        </div>
+        <div class="response-content" id="edgeCaseContent"></div>
+      </div>
+    </div>
+
+    <!-- ── Panel: Pattern ── -->
+    <div class="panel hidden" id="panel-pattern">
+      <p class="panel-desc">Detect the DSA pattern behind this problem.</p>
+      <div class="response-box hidden" id="patternResponse">
+        <div class="response-header">
+          <span class="response-label">Pattern Analysis</span>
+          <button class="copy-btn" id="copyPattern">Copy</button>
+        </div>
+        <div class="response-content" id="patternContent"></div>
+      </div>
+      <button class="primary-btn" id="patternBtn">
+        <span class="btn-icon">🧩</span> Detect Pattern
+      </button>
+      <button class="secondary-btn" id="dryRunBtn">
+        <span class="btn-icon">📊</span> Generate Dry Run
+      </button>
+      <div class="response-box hidden" id="dryRunResponse">
+        <div class="response-header">
+          <span class="response-label">Dry Run Trace</span>
+        </div>
+        <div class="response-content" id="dryRunContent"></div>
+      </div>
+    </div>
+
+    <!-- ── Panel: Complexity ── -->
+    <div class="panel hidden" id="panel-complexity">
+      <p class="panel-desc">Analyze time & space complexity. Detect TLE risks.</p>
+      <div class="response-box hidden" id="complexResponse">
+        <div class="response-header">
+          <span class="response-label">Complexity Report</span>
+          <button class="copy-btn" id="copyComplex">Copy</button>
+        </div>
+        <div class="response-content" id="complexContent"></div>
+      </div>
+      <button class="primary-btn" id="complexBtn">
+        <span class="btn-icon">⏱️</span> Analyze Complexity
+      </button>
+    </div>
+
+    <!-- ── Panel: Interview ── -->
+    <div class="panel hidden" id="panel-interview">
+      <p class="panel-desc">AI acts as your interviewer — no direct answers!</p>
+      <div class="interview-chat" id="interviewChat">
+        <div class="chat-bubble ai-bubble">
+          👋 Hello! I'm your interviewer. Let's solve this together.
+          Tell me your initial thoughts on the problem.
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="interviewInput" placeholder="Type your response…" />
+        <button class="send-btn" id="sendInterviewBtn">➤</button>
+      </div>
+    </div>
+
+    <!-- ── Footer ── -->
+    <footer class="footer">
+      <button class="footer-link" id="dashboardBtn">📈 Dashboard</button>
+      <button class="footer-link" id="notesBtn">📓 Notes</button>
+      <button class="footer-link" id="roadmapBtn">🗺️ Roadmap</button>
+    </footer>
+
+    <!-- ── Loading Overlay ── -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+      <div class="loading-card">
+        <div class="pulse-ring"></div>
+        <div class="loading-icon">🧠</div>
+        <p class="loading-text" id="loadingText">Thinking…</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
