@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'title and userCode are required' });
 
   try {
-    const model  = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model  = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const prompt = debugPrompt({ title, description, userCode, language });
     const result = await model.generateContent(prompt);
     const text   = result.response.text();
