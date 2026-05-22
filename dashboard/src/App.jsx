@@ -1,14 +1,16 @@
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Map, BookOpen, Zap } from 'lucide-react';
+import { LayoutDashboard, Map, BookOpen, Zap, ShieldCheck } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Roadmap from './pages/Roadmap';
 import Notes from './pages/Notes';
+import Privacy from './pages/Privacy';
 
 const NAV_ITEMS = [
   { to: '/',        label: 'Analytics',  icon: LayoutDashboard },
   { to: '/roadmap', label: 'Roadmap',    icon: Map             },
   { to: '/notes',   label: 'Notes',      icon: BookOpen        },
+  { to: '/privacy', label: 'Privacy',    icon: ShieldCheck     },
 ];
 
 function Layout() {
@@ -94,12 +96,14 @@ function Layout() {
                 {location.pathname === '/'        ? '📊 Analytics Dashboard'
                 : location.pathname === '/roadmap' ? '🗺️ Your Personalized Roadmap'
                 : location.pathname === '/notes'   ? '📓 Notes & Code Review'
+                : location.pathname === '/privacy' ? 'Privacy Policy'
                 : 'CodeBuddy AI'}
               </h2>
               <p className="text-gray-500 mt-1 text-sm">
                 {location.pathname === '/'        ? 'Track your DSA progress, patterns, and weak areas'
                 : location.pathname === '/roadmap' ? 'AI-generated weekly study plan based on your history'
                 : location.pathname === '/notes'   ? 'Auto-generate revision notes and get code feedback'
+                : location.pathname === '/privacy' ? 'How CodeBuddy handles extension and dashboard data'
                 : ''}
               </p>
             </motion.div>
@@ -119,6 +123,7 @@ function Layout() {
               <Route path="/"        element={<Dashboard />} />
               <Route path="/roadmap" element={<Roadmap />}   />
               <Route path="/notes"   element={<Notes />}     />
+              <Route path="/privacy" element={<Privacy />}   />
             </Routes>
           </motion.div>
         </AnimatePresence>

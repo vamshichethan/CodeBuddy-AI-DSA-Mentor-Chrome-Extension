@@ -47,6 +47,7 @@ The extension can still be pointed at a local backend from the popup settings.
 
 - GitHub Repository: https://github.com/vamshichethan/CodeBuddy-AI-DSA-Mentor-Chrome-Extension
 - Live Dashboard: https://codebuddy-ai-dsa-mentor.vercel.app
+- Privacy Policy: https://codebuddy-ai-dsa-mentor.vercel.app/privacy
 - API Health Check: https://codebuddy-ai-dsa-mentor.vercel.app/health
 - Production API Base URL: `https://codebuddy-ai-dsa-mentor.vercel.app/api`
 - Extension ZIP for private testing: `/private/tmp/codebuddy-extension.zip`
