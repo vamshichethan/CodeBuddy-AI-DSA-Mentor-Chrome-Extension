@@ -1,0 +1,35 @@
+[
+  {
+    "userId": "default_user",
+    "title": "Two Sum",
+    "pattern": "Two Pointer",
+    "hintsUsed": 1,
+    "solved": true,
+    "bugsFound": [
+      "Off-by-one error"
+    ],
+    "language": "JavaScript",
+    "createdAt": "2026-05-22T17:11:57.729Z",
+    "updatedAt": "2026-05-22T17:11:57.729Z"
+  },
+  {
+    "userId": "default_user",
+    "title": "2. Add Two Numbers",
+    "hintsUsed": 4,
+    "solved": false,
+    "bugsFound": [],
+    "language": "Choose a type",
+    "createdAt": "2026-05-22T17:13:12.808Z",
+    "updatedAt": "2026-05-22T17:13:12.808Z"
+  },
+  {
+    "userId": "default_user",
+    "title": "11. Container With Most Water",
+    "hintsUsed": 3,
+    "solved": false,
+    "bugsFound": [],
+    "language": "Choose a type",
+    "createdAt": "2026-05-22T17:16:12.434Z",
+    "updatedAt": "2026-05-22T17:16:12.434Z"
+  }
+]

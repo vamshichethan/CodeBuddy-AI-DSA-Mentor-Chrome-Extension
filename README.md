@@ -17,7 +17,7 @@
   <img src="https://img.shields.io/badge/Google-Gemini%20API-8E44AD?style=flat-square&logo=google&logoColor=white"/>
   <img src="https://img.shields.io/badge/MongoDB-Database-47A248?style=flat-square&logo=mongodb&logoColor=white"/>
   <img src="https://img.shields.io/badge/React-Dashboard-61DAFB?style=flat-square&logo=react&logoColor=black"/>
-  <img src="https://img.shields.io/badge/Status-In%20Development-orange?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Status-Deployed-brightgreen?style=flat-square"/>
 </p>
 
 <p align="center">
@@ -30,6 +30,16 @@
   <a href="#-setup">Setup</a> •
   <a href="#-resume-impact">Resume Impact</a>
 </p>
+
+---
+
+## 🌐 Live Deployment
+
+- Dashboard + API: https://codebuddy-ai-dsa-mentor.vercel.app
+- Health check: https://codebuddy-ai-dsa-mentor.vercel.app/health
+- Chrome extension default API: `https://codebuddy-ai-dsa-mentor.vercel.app/api`
+
+The extension can still be pointed at a local backend from the popup settings.
 
 ---
 
@@ -435,9 +445,9 @@ Similar Problems:
 
 ### ✅ Phase 6 — Polish & Deployment *(Week 6)*
 
-- [ ] UI/UX polish on extension popup
-- [ ] Deploy backend to **Railway / Render / AWS**
-- [ ] Deploy dashboard to **Vercel / Netlify**
+- [x] UI/UX polish on extension popup
+- [x] Deploy backend to **Vercel Serverless**
+- [x] Deploy dashboard to **Vercel**
 - [ ] Write comprehensive documentation
 - [ ] Record demo video
 - [ ] Publish to Chrome Web Store (optional)
@@ -487,6 +497,14 @@ npm run dev
 5. Pin the CodeBuddy AI extension
 6. Open any LeetCode problem
 7. Click the extension icon 🧠
+```
+
+The extension works against the deployed API by default. For local backend testing,
+open the popup settings and set:
+
+```
+Backend API URL: http://localhost:3001/api
+Dashboard URL:   http://localhost:5173
 ```
 
 ### 4. Dashboard Setup (Optional)
@@ -645,7 +663,7 @@ Tech: JavaScript · Chrome Extension MV3 · Node.js · Express · Gemini API · 
 - [ ] Phase 3: Core AI features
 - [ ] Phase 4: Advanced features
 - [ ] Phase 5: Progress dashboard
-- [ ] Phase 6: Deployment & polish
+- [x] Phase 6: Deployment & polish
 - [ ] Chrome Web Store publication
 
 ---

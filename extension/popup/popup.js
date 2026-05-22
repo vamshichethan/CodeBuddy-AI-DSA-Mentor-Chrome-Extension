@@ -3,7 +3,11 @@
 // Handles: tab switching, API calls, UI state
 // ====================================================
 
-const API_BASE = 'http://localhost:3001/api';
+const DEFAULT_API_BASE = 'https://codebuddy-ai-dsa-mentor.vercel.app/api';
+const DEFAULT_DASHBOARD_URL = 'https://codebuddy-ai-dsa-mentor.vercel.app';
+const LOCAL_API_BASE = 'http://localhost:3001/api';
+const LOCAL_DASHBOARD_URL = 'http://localhost:5173';
+const CONNECTION_KEYS = ['apiBaseUrl', 'dashboardUrl'];
 
 // ── State ──────────────────────────────────────────
 const state = {
@@ -11,6 +15,8 @@ const state = {
   hintLevel: 0,
   hintsUsed: 0,
   interviewHistory: [],
+  apiBaseUrl: DEFAULT_API_BASE,
+  dashboardUrl: DEFAULT_DASHBOARD_URL,
 };
 
 // ── DOM Refs ───────────────────────────────────────
@@ -33,7 +39,7 @@ function showResponse(boxId, contentId, text) {
 
 // Format raw text: bold **text**, code `code`, line breaks
 function formatResponse(text) {
-  return text
+  return escapeHtml(String(text || ''))
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/❌/g, '<span class="tag-bug">❌</span>')
@@ -42,9 +48,40 @@ function formatResponse(text) {
     .replace(/\n/g, '<br/>');
 }
 
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function normalizeApiBase(value) {
+  return (value || DEFAULT_API_BASE).trim().replace(/\/+$/, '');
+}
+
+function normalizeDashboardUrl(value) {
+  return (value || DEFAULT_DASHBOARD_URL).trim().replace(/\/+$/, '');
+}
+
+async function loadSettings() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(CONNECTION_KEYS, (res) => {
+      state.apiBaseUrl = normalizeApiBase(res.apiBaseUrl);
+      state.dashboardUrl = normalizeDashboardUrl(res.dashboardUrl);
+      $('apiBaseInput').value = state.apiBaseUrl;
+      $('dashboardUrlInput').value = state.dashboardUrl;
+      resolve();
+    });
+  });
+}
+
 // ── Utility: Call Backend API ─────────────────────
 async function callAPI(endpoint, body) {
-  const res = await fetch(`${API_BASE}/${endpoint}`, {
+  // Append a cache-buster query parameter to bypass Chrome's CORS preflight cache
+  const url = `${state.apiBaseUrl}/${endpoint}?t=${Date.now()}`;
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -99,6 +136,7 @@ async function readProblem() {
 
 // ── Initialise Popup ──────────────────────────────
 async function init() {
+  await loadSettings();
   const data = await readProblem();
 
   if (!data) {
@@ -131,6 +169,32 @@ async function init() {
     updateLevelButtons();
   });
 }
+
+$('settingsBtn').addEventListener('click', () => {
+  $('settingsPanel').classList.toggle('hidden');
+});
+
+$('saveSettingsBtn').addEventListener('click', () => {
+  state.apiBaseUrl = normalizeApiBase($('apiBaseInput').value);
+  state.dashboardUrl = normalizeDashboardUrl($('dashboardUrlInput').value);
+  chrome.storage.local.set({
+    apiBaseUrl: state.apiBaseUrl,
+    dashboardUrl: state.dashboardUrl,
+  }, () => showToast('Settings saved.'));
+});
+
+$('resetSettingsBtn').addEventListener('click', () => {
+  chrome.storage.local.remove(CONNECTION_KEYS, () => {
+    state.apiBaseUrl = LOCAL_API_BASE;
+    state.dashboardUrl = LOCAL_DASHBOARD_URL;
+    $('apiBaseInput').value = state.apiBaseUrl;
+    $('dashboardUrlInput').value = state.dashboardUrl;
+    chrome.storage.local.set({
+      apiBaseUrl: state.apiBaseUrl,
+      dashboardUrl: state.dashboardUrl,
+    }, () => showToast('Switched to local development URLs.'));
+  });
+});
 
 // ── Level Button States ───────────────────────────
 function updateLevelButtons() {
@@ -183,6 +247,9 @@ $('getHintBtn').addEventListener('click', async () => {
     // Persist
     chrome.storage.local.set({ [`hintLevel_${state.problemData.title}`]: state.hintLevel });
 
+    // Log to Dashboard Database
+    logSession({ hintsUsed: state.hintsUsed, solved: false });
+
     $('hintLabel').textContent = `Level ${nextLevel} Hint`;
     showResponse('hintResponse', 'hintContent', res.hint || res.response || JSON.stringify(res));
     updateLevelButtons();
@@ -206,6 +273,10 @@ $('debugBtn').addEventListener('click', async () => {
       userCode: state.problemData.userCode,
       language: state.problemData.language,
     });
+
+    // Log bug found to Dashboard Database
+    logSession({ bugsFound: ["Logic Error"] });
+
     showResponse('debugResponse', 'debugContent', res.debug || res.response || JSON.stringify(res));
   } catch (e) {
     showToast(`Error: ${e.message}`);
@@ -243,6 +314,10 @@ $('patternBtn').addEventListener('click', async () => {
       title: state.problemData.title,
       description: state.problemData.description,
     });
+
+    // Log pattern to Dashboard Database
+    logSession({ pattern: res.patternName || "Unknown" });
+
     showResponse('patternResponse', 'patternContent', res.pattern || res.response || JSON.stringify(res));
   } catch (e) {
     showToast(`Error: ${e.message}`);
@@ -337,6 +412,24 @@ function appendChatBubble(text, role) {
   chat.scrollTop = chat.scrollHeight;
 }
 
+// ── Dashboard Logging ─────────────────────────────
+async function logSession(updates = {}) {
+  if (!state.problemData) return;
+  try {
+    await callAPI('progress', {
+      userId: 'default_user', // Could be from Chrome Identity API
+      title: state.problemData.title,
+      language: state.problemData.language || 'Unknown',
+      hintsUsed: state.hintsUsed,
+      solved: updates.solved || false,
+      pattern: updates.pattern,
+      bugsFound: updates.bugsFound || []
+    });
+  } catch (err) {
+    console.error('Failed to log session', err);
+  }
+}
+
 // ── Copy Buttons ──────────────────────────────────
 $('copyHint').addEventListener('click',    () => copyText('hintContent'));
 $('copyDebug').addEventListener('click',   () => copyText('debugContent'));
@@ -345,13 +438,13 @@ $('copyComplex').addEventListener('click', () => copyText('complexContent'));
 
 // ── Footer Links ──────────────────────────────────
 $('dashboardBtn').addEventListener('click', () => {
-  chrome.tabs.create({ url: 'http://localhost:5173' });
+  chrome.tabs.create({ url: state.dashboardUrl });
 });
 $('notesBtn').addEventListener('click', () => {
-  chrome.tabs.create({ url: 'http://localhost:5173/notes' });
+  chrome.tabs.create({ url: `${state.dashboardUrl}/notes` });
 });
 $('roadmapBtn').addEventListener('click', () => {
-  chrome.tabs.create({ url: 'http://localhost:5173/roadmap' });
+  chrome.tabs.create({ url: `${state.dashboardUrl}/roadmap` });
 });
 
 // ── Toast Notification ────────────────────────────
@@ -369,7 +462,7 @@ function showToast(msg) {
     border-radius: 20px; z-index: 999; white-space: nowrap;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     animation: fadeIn 0.2s ease;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   `;
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);

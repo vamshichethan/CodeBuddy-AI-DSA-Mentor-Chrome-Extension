@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'title and userMessage are required' });
 
   try {
-    const model  = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model  = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
     const prompt = interviewPrompt({ title, description, history, userMessage });
     const result = await model.generateContent(prompt);
     const text   = result.response.text();

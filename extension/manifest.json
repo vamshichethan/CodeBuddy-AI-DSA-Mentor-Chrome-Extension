@@ -9,7 +9,12 @@
     "scripting"
   ],
   "host_permissions": [
-    "https://leetcode.com/*"
+    "https://leetcode.com/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "https://*.vercel.app/*",
+    "https://*.onrender.com/*",
+    "https://*.railway.app/*"
   ],
   "background": {
     "service_worker": "background.js"

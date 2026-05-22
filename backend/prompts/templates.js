@@ -208,6 +208,77 @@ Respond as the Interviewer:
 `.trim();
 }
 
+/**
+ * Roadmap generator prompt
+ */
+function roadmapPrompt({ weakAreas, recentSessions }) {
+  return `
+${SYSTEM_CONTEXT}
+
+You are generating a personalized DSA study roadmap for a student.
+
+User's Weak Areas:
+${JSON.stringify(weakAreas, null, 2)}
+
+User's Recent Sessions:
+${JSON.stringify(recentSessions, null, 2)}
+
+Generate a focused, actionable 1-week study plan targeting their weakest patterns.
+Format as a clean markdown list.
+Include 3-4 specific LeetCode problem recommendations that build up in difficulty.
+Keep it encouraging but concise.
+`.trim();
+}
+
+/**
+ * Notes auto-generator prompt
+ */
+function notesPrompt({ title, description, pattern, language, userCode }) {
+  return `
+${SYSTEM_CONTEXT}
+
+Problem: ${title}
+Pattern Used: ${pattern}
+Description: ${description.slice(0, 400)}
+
+User's Final Code (${language}):
+\`\`\`${language}
+${userCode}
+\`\`\`
+
+Generate a concise revision note for this problem.
+Format:
+**Pattern:** [pattern name]
+**Key Trick/Insight:** [1-2 sentences on the core logic]
+**Complexity:** Time O(?) | Space O(?)
+**Edge Cases to Remember:** [list 1-2 edge cases]
+`.trim();
+}
+
+/**
+ * AI Code Review prompt
+ */
+function reviewPrompt({ title, userCode, language }) {
+  return `
+${SYSTEM_CONTEXT}
+
+You are reviewing a successfully accepted LeetCode submission to help the user write cleaner, more professional code.
+
+Problem: ${title}
+User's Code (${language}):
+\`\`\`${language}
+${userCode}
+\`\`\`
+
+Provide a constructive code review focusing on:
+1. **Optimization:** Are there any redundant loops or memory allocations?
+2. **Clean Code:** Can variable names be improved? Can logic be simplified?
+3. **Idiomatic ${language}:** Are they using the best language features?
+
+Keep it positive and concise. Provide a short rewritten version if significant improvements can be made.
+`.trim();
+}
+
 module.exports = {
   hintPrompt,
   debugPrompt,
@@ -216,4 +287,7 @@ module.exports = {
   complexityPrompt,
   edgeCasePrompt,
   interviewPrompt,
+  roadmapPrompt,
+  notesPrompt,
+  reviewPrompt,
 };

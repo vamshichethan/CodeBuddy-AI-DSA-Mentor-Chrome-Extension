@@ -23,6 +23,23 @@
       </div>
     </header>
 
+    <!-- ── Settings ── -->
+    <section class="settings-panel hidden" id="settingsPanel">
+      <div class="settings-title">Connection Settings</div>
+      <div class="settings-field">
+        <label for="apiBaseInput">Backend API URL</label>
+        <input class="settings-input" id="apiBaseInput" type="url" placeholder="https://your-app.vercel.app/api" />
+      </div>
+      <div class="settings-field">
+        <label for="dashboardUrlInput">Dashboard URL</label>
+        <input class="settings-input" id="dashboardUrlInput" type="url" placeholder="https://your-app.vercel.app" />
+      </div>
+      <div class="settings-actions">
+        <button id="saveSettingsBtn">Save</button>
+        <button id="resetSettingsBtn">Use Local</button>
+      </div>
+    </section>
+
     <!-- ── Problem Card ── -->
     <div class="problem-card" id="problemCard">
       <div class="problem-loading" id="problemLoading">
@@ -73,6 +90,10 @@
             <span class="lv">🔒</span><span class="lv-label">Code</span>
           </button>
         </div>
+        <!-- Anti-cheat gate strip -->
+        <div class="anticheat-strip" id="antiCheatStrip">
+          🔒 <strong>Level 5 locked</strong> — Use 3+ hints first to unlock the solution.
+        </div>
       </div>
       <div class="response-box hidden" id="hintResponse">
         <div class="response-header">
@@ -85,6 +106,7 @@
         <span class="btn-icon">✨</span> Get Next Hint
       </button>
     </div>
+
 
     <!-- ── Panel: Debug ── -->
     <div class="panel hidden" id="panel-debug">
